@@ -39,7 +39,7 @@ trap 'echo; echo -e "${RED}Interrupted.${RESET}"; exit 130' INT TERM HUP
 # ---------------------------------------------------------------------------
 
 PACKAGES_CORE=(
-  plasma svgpart markdownpart kio kio-extras kio-admin
+  plasma-login-manager plasma svgpart markdownpart kio kio-extras kio-admin
   kio-fuse kio-gdrive kio-zeroconf
   orca cryfs gocryptfs ripgrep ripgrep-all
   hunspell-en_us sshfs qt6-tools kcron
@@ -207,7 +207,7 @@ PACKAGES_UTILITIES=(
 # (no such pacman hook exists out of the box), so nothing here is enabled
 # automatically behind our back — anything we want running has to be listed
 # explicitly, and anything not listed here genuinely doesn't need to be.
-SYSTEM_UNITS_CORE=(cups.socket power-profiles-daemon.service)
+SYSTEM_UNITS_CORE=(cups.socket power-profiles-daemon.service plasmalogin.service)
 USER_UNITS_CORE=(app-org.kde.krdpserver.service)
 SYSTEM_UNITS_GRAPHICS=()
 USER_UNITS_GRAPHICS=()
@@ -532,23 +532,6 @@ _enable_units() {
   done
 }
 
-_list_categories() {
-  echo "${BOLD}Available categories:${RESET}"
-  echo
-  printf " ${CYAN}%-15s${RESET} %s\n" "core" "Core KDE libraries, extensions & applications"
-  printf " ${CYAN}%-15s${RESET} %s\n" "graphics" "Image/video editors, color tools, viewers"
-  printf " ${CYAN}%-15s${RESET} %s\n" "office" "Document editors, viewers, productivity tools"
-  printf " ${CYAN}%-15s${RESET} %s\n" "multimedia" "Audio/video players, editors, photo management"
-  printf " ${CYAN}%-15s${RESET} %s\n" "internet" "Browsers, download managers, remote desktop, KDE Connect"
-  printf " ${CYAN}%-15s${RESET} %s\n" "pim" "Personal information management: mail, calendar, contacts"
-  printf " ${CYAN}%-15s${RESET} %s\n" "development" "IDEs, debuggers, compilers, dev tools"
-  printf " ${CYAN}%-15s${RESET} %s\n" "system" "System monitoring, disk management, maintenance"
-  printf " ${CYAN}%-15s${RESET} %s\n" "games" "Games and gaming utilities"
-  printf " ${CYAN}%-15s${RESET} %s\n" "accessibility" "Accessibility tools and assistive technologies"
-  printf " ${CYAN}%-15s${RESET} %s\n" "education" "Educational software and tools"
-  printf " ${CYAN}%-15s${RESET} %s\n" "utilities" "Miscellaneous desktop utilities"
-}
-
 # ---------------------------------------------------------------------------
 # --show-packages
 # ---------------------------------------------------------------------------
@@ -642,7 +625,6 @@ ${BOLD}Options:${RESET}
   ${CYAN}-y, --yes${RESET}                   Skip confirmation prompts (assume yes)
   ${CYAN}-n, --dry-run${RESET}               Simulate installation without making changes
   ${CYAN}    --no-units${RESET}              Skip enabling systemd units
-  ${CYAN}-l, --list${RESET}                  List available categories and exit
   ${CYAN}    --category CAT [CAT...]${RESET} Select one or more categories to install
   ${CYAN}    --show-packages${RESET}         Print packages for the selected categories and exit
   ${CYAN}    --exclude PKG [PKG...]${RESET}  Exclude one or more packages from installation
@@ -677,7 +659,7 @@ EOF
 # Argument parsing
 # ---------------------------------------------------------------------------
 
-# All valid category names in one place — keep in sync with package arrays and --list.
+# All valid category names in one place — keep in sync with package arrays and --help.
 _valid_categories='core|graphics|office|multimedia|internet|pim|development|system|games|accessibility|education|utilities'
 
 _is_category() {
@@ -697,10 +679,6 @@ _parse_args() {
     case "$1" in
       -h | --help)
         _show_help
-        exit 0
-        ;;
-      -l | --list)
-        _list_categories
         exit 0
         ;;
       -a | --all)
@@ -729,7 +707,7 @@ _parse_args() {
             OPT_CATEGORY_EXPLICIT=true
             shift
           else
-            _die "Unknown category '$1'. Run '${0##*/} --list' for valid categories."
+            _die "Unknown category '$1'. Run '${0##*/} --help' for valid categories."
           fi
         done
         [[ $_cat_consumed -eq 0 ]] && _die "--category requires at least one valid category name."
@@ -918,7 +896,7 @@ main() {
 
   # --category is mandatory (--all counts as providing categories)
   if [[ $NUM_CATEGORIES -eq 0 ]]; then
-    _die "--category is required. Run '${0##*/} --list' for available categories."
+    _die "--category is required. Run '${0##*/} --help' for available categories."
   fi
 
   # --show-packages: display only. -y/--no-units affect the install step,
