@@ -459,6 +459,7 @@ If you find this repo useful, you might want to see the work of these people as 
 
 #### Applets / Widgets / Plasmoids
 
+- `plasma-pass` [🔗](https://www.dvratil.cz/2018/05/plasma-pass/) - a plasmoid for the `pass`, "**the standard Unix password manager**"
 - `plasma6-applets-arch-update-notifier` `[AUR]` [🔗](https://github.com/bouteillerAlan/archupdate) - plasmoid that lets you know when arch updates are required
 - `plasma6-applets-fokus` `[AUR]` [🔗](https://gitlab.com/divinae/focus-plasmoid) - a simple pomodoro plasmoid
 - `plasma6-applets-panel-colorizer` `[AUR]` [🔗](https://github.com/luisbocanegra/plasma-panel-colorizer) - customize your panel however you want
